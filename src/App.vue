@@ -16,8 +16,7 @@
               <div class="item-actions">
                 <div class="quantity-selector">
                   <button class="quantity-change-button" @click="decreaseOne(item.id)">−</button>
-                  <input type="text" class="quantity-input" aria-label="quantity"
-                    v-model.number="item.quantity">
+                  <input type="text" class="quantity-input" aria-label="quantity" v-model.number="item.quantity">
                   <button class="quantity-change-button" @click="increaseOne(item.id)">+</button>
                 </div>
                 <button class="remove-item" @click="removeItem(item.id)">✕</button>
@@ -55,7 +54,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { watch, computed, ref } from 'vue'
 
 let username = 'Harry'
 let shoppingCartItems = ref([
@@ -120,20 +119,24 @@ function increaseOne(id) {
   })
 }
 
-function removeItem(id){
+function removeItem(id) {
   let index = shoppingCartItems.value.findIndex(item => {
     return item.id == id
   })
   shoppingCartItems.value.splice(index, 1)
 }
 
-let subTotal = computed(() => shoppingCartItems.value.reduce((acc, item)=> acc + item.price * item.quantity, 0))
+let subTotal = computed(() => shoppingCartItems.value.reduce((acc, item) => acc + item.price * item.quantity, 0))
 
 let shippingEstimate = computed(() => (subTotal.value > 10000 ? 100 : 50))
 
 let taxEstimate = computed(() => subTotal.value * 0.08)
 
 let total = computed(() => subTotal.value + shippingEstimate.value + taxEstimate.value)
+
+watch(shoppingCartItems, () => {
+  localStorage.setItem('hogwartsShoppingCart', JSON.stringify(shoppingCartItems.value))
+}, { deep: true })
 
 </script>
 
